@@ -1,0 +1,42 @@
+import pygame
+import sys
+
+#put here the audio
+
+# Load images
+START_BACKGROUND = pygame.image.load("images/startgameimages/start background.jpg")
+LEAF_TRACK = pygame.image.load("images/gamescreen/leaf and trckaer.png")
+FINISH = pygame.image.load("images/gamescreen/finish.png")
+SNAIL1 = pygame.image.load("images/gamescreen/player1.png")
+SNAIL2 = pygame.image.load("images/gamescreen/player2.png")
+
+# Set up window
+WIDTH, HEIGHT = START_BACKGROUND.get_width(), START_BACKGROUND.get_height()
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snail Race Game!")
+FPS = 60
+
+clock = pygame.time.Clock()
+run = True
+
+while run:
+    clock.tick(FPS)
+
+    # Draw background
+    WIN.blit(START_BACKGROUND, (0, 0))
+    WIN.blit(LEAF_TRACK, (0, 0))
+    WIN.blit(FINISH, (0, 0))
+
+    # Update display 👇 (this was missing)
+    pygame.display.update()
+
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+
+
+# put here the while music
+
+pygame.quit()
+sys.exit()
