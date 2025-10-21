@@ -1,0 +1,28 @@
+import pygame
+
+# Initialize the mixer
+pygame.mixer.init()
+
+# Load your music file (replace with your file path)
+pygame.mixer.music.load("your_music.mp3")
+
+# Play the music
+pygame.mixer.music.play()
+
+# Keep the program running while the music plays
+while pygame.mixer.music.get_busy():
+    continue
+
+
+pygame.init()
+# Initialize the mixer
+pygame.mixer.init()
+pygame.mixer.music.load("audio/Happy Tree Friends Theme Song.mp3")
+# Play the music
+pygame.mixer.music.play()
+
+
+
+# Keep the program running while the music plays
+while pygame.mixer.music.get_busy():
+    continue
