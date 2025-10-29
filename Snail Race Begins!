@@ -103,7 +103,7 @@ while running:
             if len(tap_times) > max_taps:
                 dizzy = True
                 game_over = True
-                status_text = "Too fast! Snail got dizzy. Press R to reset."
+                status_text = "YOU LOSE! Snail got dizzy. Press R to reset."
                 continue
 
             # Too short interval between two taps → dizzy
@@ -112,7 +112,7 @@ while running:
                 if interval < min_tap_interval:
                     dizzy = True
                     game_over = True
-                    status_text = "Too fast! Snail got dizzy. Press R to reset."
+                    status_text = "YOU LOSE! Too fast! Snail got dizzy. Press R to reset."
                     continue
 
             # Move snail
@@ -121,7 +121,7 @@ while running:
             # Check win
             if snail_x == finish_line:
                 game_over = True
-                status_text = "Slow and steady wins! Press R to reset."
+                status_text = "YOU WIN! Press R to reset."
 
         elif event.type == pygame.KEYDOWN:
             # Reset on R
@@ -130,7 +130,7 @@ while running:
                 game_over = False
                 dizzy = False
                 tap_times = []
-                status_text = "Tap slowly to move the snail!"
+                status_text = "Tap SLOWLY AND STEADY to move the snail!"
 
             # Toggle music with M
             elif event.key == pygame.K_m:
