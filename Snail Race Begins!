@@ -1,0 +1,148 @@
+import pygame
+import time
+import math
+
+pygame.init()
+
+# Concept - avah, snail must went to the dinish base on the user's speed of taps,
+# if the user tapped fast, it'll e dizzy and lose
+# but if the user tapped slow and steady and reach at the finish line, it'll win
+
+
+# Screen dimensions - patrick
+WIDTH = 800
+HEIGHT = 500
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snail Race Begins!")
+
+
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+GREEN = (0, 255, 0)
+
+# images- design - ciara
+SNAIL1 = pygame.image.load('pytgame/images/gamescreen/player1.png')
+BACKGROUND = pygame.image.load('pytgame/images/startgameimages/start background.jpg')
+START = pygame.image.load('pytgame/images/gamescreen/start.png')
+FINISH = pygame.image.load('pytgame/images/gamescreen/finish.png')
+LOGO = pygame.image.load("pytgame/images/startgameimages/gametitlelogo.png")
+TAPTPSTART = pygame.image.load("pytgame/images/startgameimages/Taptostart.png")
+
+# Scale images
+snail1_img = pygame.transform.scale_by(SNAIL1, 0.1)
+bg_img = pygame.transform.scale(BACKGROUND, (WIDTH, HEIGHT))
+start_img = pygame.transform.scale_by(START, 0.9)
+finish_img = pygame.transform.scale_by(FINISH, 0.9)
+logo_img = pygame.transform.scale_by(LOGO, 0.3)
+tap_to_start_img = pygame.transform.scale_by(TAPTPSTART, 0.3)
+
+# Font
+font = pygame.font.SysFont(None, 36)
+
+
+# Game variables
+COUNT_OF_TAPS = 0
+snail_x = 50
+snail_y = 225
+move_distance = 10
+finish_line = 700   # reachable finish
+game_over = False
+dizzy = False
+tap_times = []      # stores tap timestamps
+max_taps = 40       # max allowed in time window
+time_window = 3000  # 3 seconds in ms
+min_tap_interval = 150  # min gap between taps (too fast if less)
+status_text = "Tap slowly to move the snail!"
+
+# Music - kinsley
+pygame.mixer.music.load("pytgame/audio/Happy Tree Friends Theme Song copy.mp3")
+pygame.mixer.music.play(-1)  # loop forever
+music_on = True
+
+
+clock = pygame.time.Clock()
+FPS = 60
+
+
+def draw(): # - ciara
+    WIN.blit(bg_img, (0, 0))
+    WIN.blit(start_img, (0, 200))
+    WIN.blit(logo_img, (230, 100))
+    WIN.blit(finish_img, (250, 80))
+
+    # Snail dizzy effecte
+    if dizzy:
+        shake_offset = int(math.sin(pygame.time.get_ticks() / 100) * 5)
+        WIN.blit(snail1_img, (snail_x + shake_offset, snail_y))
+    else:
+        WIN.blit(snail1_img, (snail_x, snail_y))
+
+    # Progress bar
+    pygame.draw.rect(WIN, GREEN, (50, 350, (snail_x / finish_line) * 700, 20))
+    pygame.draw.rect(WIN, WHITE, (50, 350, 700, 20), 2)
+
+    # comments
+    text_surf = font.render(status_text, True, WHITE)
+    WIN.blit(text_surf, (WIDTH // 2 - text_surf.get_width() // 2, 50))
+running = True
+while running:
+    WIN.fill(WHITE)
+
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+        elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
+            current_time = pygame.time.get_ticks()
+            tap_times.append(current_time)
+
+            # Keep the times, t means taps_time, if the milimiseconds from taps duration is less than time window it is true
+            tap_times = [t for t in tap_times if current_time - t < time_window]
+
+            # Too many taps in short window → dizzy
+            if len(tap_times) > max_taps:
+                dizzy = True
+                game_over = True
+                status_text = "Too fast! Snail got dizzy. Press R to reset."
+                continue
+
+            # Too short interval between two taps → dizzy
+            if len(tap_times) > 1:
+                interval = tap_times[-1] - tap_times[-2]
+                if interval < min_tap_interval:
+                    dizzy = True
+                    game_over = True
+                    status_text = "Too fast! Snail got dizzy. Press R to reset."
+                    continue
+
+            # Move snail
+            snail_x += move_distance
+
+            # Check win
+            if snail_x == finish_line:
+                game_over = True
+                status_text = "Slow and steady wins! Press R to reset."
+
+        elif event.type == pygame.KEYDOWN:
+            # Reset on R
+            if event.key == pygame.K_r and game_over:
+                snail_x = 0
+                game_over = False
+                dizzy = False
+                tap_times = []
+                status_text = "Tap slowly to move the snail!"
+
+            # Toggle music with M
+            elif event.key == pygame.K_m:
+                if music_on:
+                    pygame.mixer.music.pause()
+                    music_on = False
+                else:
+                    pygame.mixer.music.unpause()
+                    music_on = True
+
+    draw()
+    pygame.display.flip()
+    clock.tick(FPS)
+
+pygame.quit()
