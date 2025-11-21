@@ -1,0 +1,130 @@
+import pygame
+import sys
+import random
+import time
+
+pygame.init()
+
+# Our Snail Race Game is it has 10 limit of taps but every tap is depends the user tapping method
+# if its fast tap the output were long length if it is slow short length so we import random
+# the concept is that in 10 taps you must not went to the finish you lost.
+
+# Load images - designs: ciara
+START_BACKGROUND = pygame.image.load("pytgame/images/startgameimages/start background.jpg")
+LOGO = pygame.image.load("pytgame/images/startgameimages/gametitlelogo.png")
+LEAF_TRACK = pygame.image.load("pytgame/images/gamescreen/leaf and trckaer.png")
+BGM = pygame.image.load("pytgame/images/settingicons/BGMicon.png")
+START = pygame.image.load("pytgame/images/gamescreen/start.png")
+FINISH = pygame.image.load("pytgame/images/gamescreen/finish.png")
+SNAIL1 = pygame.image.load("pytgame/images/gamescreen/player1.png")
+BGM = pygame.image.load("pytgame/images/settingicons/BGMicon.png")
+YOU_DID_IT = pygame.image.load("pytgame/images/statuss/Youdiditmessage.png")
+YOU_LOSE = pygame.image.load("pytgame/images/statuss/Youlosemessage.png")
+
+# Set up the window - patrick
+WIDTH, HEIGHT = START_BACKGROUND.get_width(), START_BACKGROUND.get_height() # bg w= 1200, h = 1600
+WIN = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Snail Race Game!")
+FPS = 60
+
+logo = pygame.transform.scale_by(LOGO, 0.5)
+snail1 = pygame.transform.scale_by(SNAIL1, 0.1)
+bgm = pygame.transform.scale_by(BGM, 0.3)
+you_did_it = pygame.transform.scale_by(YOU_DID_IT, 0.3)
+you_lose = pygame.transform.scale_by(YOU_LOSE, 0.3)
+
+#music
+bgm_rect = bgm.get_rect(center=(WIDTH // 2, HEIGHT // 2))
+
+
+clock = pygame.time.Clock()
+run = True
+
+#music - kins
+pygame.mixer.music.load("pytgame/audio/Happy Tree Friends Theme Song.mp3")
+pygame.mixer.music.play(1)  # never ending music, 1 means left click
+music_paused = False
+
+#bgm image
+
+#font, limit, countdown, conditions - avah
+
+COUNT_OF_TAPS = 0
+LIMIT = 10
+FINISH_LINE = 500
+SNAIL_POSITION = 0
+TIME_STAMPS = time.time()
+TAP_DURATION = 0.5 #time in second i considered as fast tap from user's input
+FONT = pygame.font.SysFont(None, 20)
+GREEN = (0, 255, 0) # color for the font comment
+
+# defining what are the randoms for the conditions - ciara
+def GET_JUMP_DISTANCE(TIME_DIFFERNCE):
+    if TIME_DIFFRENCE < TAP_DURATION:
+        JUMP_DURATION = random.randint(20, 70)  # if Fast tap: long base jump between 50 to 100
+    else:
+        JUMP_DURATION = random.randint(5, 20)  # Slow tap: smaller base jump between 10 to 30
+    return JUMP_DURATION + random.randint(-5, 5)  # Add some randomness also between -10 to 10
+
+def draw_snail(pos):
+    y = 230  # Vertical position where you want to place the snail
+    WIN.blit(snail1, (pos, y))
+
+def draw_finish_line():
+    WIN.blit(FINISH, (0, 0))  # Draw at top-left corner
+
+
+while run:
+    
+
+    # Draw background
+    WIN.blit(START_BACKGROUND, (0, 0))
+    WIN.blit(LEAF_TRACK, (0, 0))
+    WIN.blit(logo, (3, 10))
+    WIN.blit(bgm, (340, 365))
+    WIN.blit(START, (0, 125))
+    draw_snail(SNAIL_POSITION)
+    draw_finish_line()
+    
+    # display the 10 count to 0 - ciara
+    COMMENT_COUNTDOWN = FONT.render(f"Taps: {COUNT_OF_TAPS}/{LIMIT}", True, GREEN)
+    WIN.blit(COMMENT_COUNTDOWN, (10, 560))
+    TAP_TO_START = FONT.render("Tap SPACE to move the snail!", True, GREEN)
+    WIN.blit(TAP_TO_START, (10, 580))
+
+    # Handle events
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            run = False
+            pygame.quit()
+            sys.exit()
+        elif event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_SPACE and COUNT_OF_TAPS < LIMIT:
+                CURRENT_TIME_STAMPS = time.time()
+                TIME_DIFFRENCE = CURRENT_TIME_STAMPS - TIME_STAMPS
+                JUMP = GET_JUMP_DISTANCE(TIME_DIFFRENCE)  # it shows how big or short the length of each jump from user's taps
+                SNAIL_POSITION += JUMP
+                COUNT_OF_TAPS += 1
+                TIME_STAMPS = CURRENT_TIME_STAMPS
+                
+            # Check if finished after 10 taps
+                if COUNT_OF_TAPS == LIMIT:
+                    if SNAIL_POSITION >= FINISH_LINE:  # Fixed: Use FINISH_LINE (500) instead of FINISH (the image)
+                        WIN.blit(you_lose, (100, 100))  # Fixed: Lowercase 'blit'
+                    else:
+                        WIN.blit(you_did_it, (100, 100))
+                    pygame.display.flip()  # Moved outside the if-else for consistency
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if bgm_rect.collidepoint(event.pos):
+                if music_paused:
+                    pygame.mixer.music.unpause()
+                    music_paused = False
+                else:
+                    pygame.mixer.music.pause()
+                    music_paused = True
+    pygame.display.flip()
+    clock.tick(FPS)
+pygame.quit()
+sys.exit()
+
+
